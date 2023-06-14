@@ -162,13 +162,23 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    command: db init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        python3 -m airflow db init \
+        && python3 -m airflow users create \
+            --username airflow \
+            --firstname airflow \
+            --lastname airflow \
+            --role Admin \
+            --email airflow@example.org \
+            --password airflow \
+        && mkdir -p /sources/logs /sources/dags /sources/plugins \
+        && chown -R "50000:0" /sources/{logs,dags,plugins}
+    user: "0:0"
     environment:
       <<: *airflow-common-env
-      _AIRFLOW_DB_UPGRADE: 'true'
-      _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
 
@@ -190,7 +200,8 @@ services:
   # See: https://docs.docker.com/compose/profiles/
   flower:
     <<: *airflow-common
-    command: celery flower
+    entrypoint: python3 -m celery
+    command: flower
     profiles:
       - flower
     ports:

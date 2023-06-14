@@ -17,4 +17,8 @@ build:
 
 .PHONY: up
 up: build
-	docker compose up -d
+	docker compose --profile flower up -d 
+
+.PHONY: down
+down:
+	docker compose --profile flower down
