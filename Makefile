@@ -22,3 +22,11 @@ up: build
 .PHONY: down
 down:
 	docker compose --profile flower down
+
+.PHONY: docker-update-constraints
+docker-update-constraints:
+	docker compose run dev \
+        bash -c "cd /root/sources \
+        && pip install pip-tools \
+		&& make update-constraints"
+

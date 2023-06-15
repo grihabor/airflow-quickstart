@@ -218,5 +218,13 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  dev:
+    image: python:3.11
+    profiles:
+      - dev
+    volumes:
+      - .:/root/sources
+
 volumes:
   postgres-db-volume:
+  pip-cache:
